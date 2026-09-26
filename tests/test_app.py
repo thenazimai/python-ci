@@ -2,7 +2,7 @@
 
 import pytest
 
-from app import add, classify_number, divide, fahrenheit_to_celsius, main
+from src.app import add, classify_number, divide, fahrenheit_to_celsius, main
 
 
 def test_add():

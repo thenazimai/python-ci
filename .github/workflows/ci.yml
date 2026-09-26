@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: requirements-dev.lock
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.lock
+
+      - name: Check formatting with Black
+        run: black --check --diff .
+
+      - name: Lint with Flake8
+        run: flake8 src tests
+
+      - name: Security scan with Bandit
+        run: bandit -r . -x ./tests,./.venv
+
+      - name: Scan for hardcoded secrets
+        run: |
+          pip install semgrep
+          semgrep --config .semgrep/password-rules.yml src tests
+
+      - name: Audit dependencies with pip-audit
+        run: pip-audit
+
+      - name: Run tests with coverage
+        run: pytest --cov=app --cov-report=term --cov-report=xml
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v5
+        with:
+          name: coverage-report
+          path: coverage.xml
+          retention-days: 14
+
+      - name: Send email notification
+        if: always()
+        uses: dawidd6/action-send-mail@v4
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "CI: ${{ job.status }} — ${{ github.repository }} #${{ github.run_number }}"
+          to: ${{ secrets.EMAIL_TO }}
+          from: "GitHub Actions <${{ secrets.SMTP_USERNAME }}>"
+          body: |
+            Workflow "${{ github.workflow }}" finished with status: ${{ job.status }}
+
+            Repository: ${{ github.repository }}
+            Commit: ${{ github.sha }}
+            Details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
