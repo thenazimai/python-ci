@@ -5,7 +5,7 @@ exercise a GitHub Actions pipeline (format, lint, security, tests,
 coverage), not to demonstrate Python itself.
 """
 
-AWS_SECRET = 1253697
+AWS_SECRET = "yyyyiyikhhkh"
 
 
 def add(a: float, b: float) -> float:
