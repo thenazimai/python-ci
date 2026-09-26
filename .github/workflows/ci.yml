@@ -37,7 +37,7 @@ jobs:
 
       - name: Scan for hardcoded secrets
         run: |
-          pip install semgrep
+          python -m pip install semgrep
           semgrep --config .semgrep/password-rules.yml src tests
 
       - name: Audit dependencies with pip-audit
