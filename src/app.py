@@ -5,8 +5,6 @@ exercise a GitHub Actions pipeline (format, lint, security, tests,
 coverage), not to demonstrate Python itself.
 """
 
-AWS_SECRET = "yyyyiyikhhkh"
-
 
 def add(a: float, b: float) -> float:
     """Return the sum of ``a`` and ``b``."""
