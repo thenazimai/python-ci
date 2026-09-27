@@ -56,12 +56,15 @@ jobs:
       - name: Send email notification
         if: always()
         uses: dawidd6/action-send-mail@v4
+        continue-on-error: true # Prevents email timeout from failing the overall job
         with:
           server_address: ${{ secrets.SMTP_SERVER }}
           server_port: ${{ secrets.SMTP_PORT }}
+          secure: false
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
-          subject: "CI: ${{ job.status }} — ${{ github.repository }} #${{ github.run_number }}"
+          # subject: "CI: ${{ job.status }} — ${{ github.repository }} #${{ github.run_number }}"
+          subject: "CI Result: ${{ job.status }} - ${{ steps.tests.outcome }}"
           to: ${{ secrets.EMAIL_TO }}
           from: "GitHub Actions <${{ secrets.SMTP_USERNAME }}>"
           body: |
